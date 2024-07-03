@@ -1,0 +1,3 @@
+server=prtg-99-102.comtelindia.com:10443
+username=PNS.01
+passhash=3287591112
