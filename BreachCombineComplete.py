@@ -31,10 +31,24 @@ else:
     print("Invalid input! Please enter either '99.100', '101.100', or '99.102'.")
     exit()
 
+
+
 server_address = server_parameters.get("server")
 username = server_parameters.get("username")
 passhash = server_parameters.get("passhash")
 param = server_parameters.get("day")
+
+
+current_datetime = datetime.now().strftime("%d %B %Y %I:%M %p")
+
+if server_address and "99-102" in server_address:
+    h2_content = f"Prtg-99-102-Logs-{current_datetime}"
+elif server_address and "101-100" in server_address:
+     h2_content = f"Prtg-101-100 Logs-{current_datetime}"
+elif server_address and "99-100" in server_address:
+    h2_content = f"Prtg-99-100 Logs-{current_datetime}"
+else:
+    h2_content ="PRTG LOGS"
 
 current_datetime = datetime.now().strftime("%d_%B_%Y_%I_%M_%p")
 
@@ -44,7 +58,7 @@ if "99-102" in server_address:
        
 elif "101-100" in server_address:
     file_path = f"prtg-{current_datetime}-101.100.xml"
-    output_file= f"prtg-{current_datetime}-99.100.txt"
+    output_file= f"prtg-{current_datetime}-101.100.txt"
 elif "99-100" in server_address:
     file_path = f"prtg-{current_datetime}-99.100.xml"
     output_file= f"prtg-{current_datetime}-99.100.txt"
@@ -245,7 +259,7 @@ for id_value in tqdm(id_values, desc="Processing IDs"):
             "Sensor Name": sensor_device_name,
             "Sensor ID": id_value,
             "Date": row['Date Time'] if row['Traffic Total (Speed)'] > upper_warning_limits.get(id_value) else "N/A",
-            "Message":"Breach",
+            "Message":"Traffic total cross upper warning limit",
             "Traffic Total": row["Traffic Total (Speed)"]
             
         } for index, row in df.iterrows() if row['Traffic Total (Speed)'] > upper_warning_limits.get(id_value)])
@@ -259,7 +273,7 @@ for id_value in tqdm(id_values, desc="Processing IDs"):
             "Sensor Name": sensor_device_name,
             "Sensor ID": id_value,
             "Date": max_traffic_date,
-            "Message":"Not breach",
+            "Message":"Traffic total is under upper warning limit",
             "Traffic Total": max_traffic
         })
 
@@ -273,7 +287,7 @@ if "99-100" in server_address:
     current_datetime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     csv_file = f"prtg-{current_datetime}-99.100.csv"
 
-if "99-101" in server_address:
+if "101-100" in server_address:
     current_datetime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     csv_file = f"prtg-{current_datetime}-99.101.csv"
 
@@ -376,15 +390,15 @@ function toggleDetails(elementId) {
 </script>
 </head>
 <body>
-<h2>Sensor Data Summary</h2>
+<h2>%s</h2>
 <ul>
-"""
+"""% h2_content
 
 # Loop through grouped data and create HTML structure
 for message, devices in grouped_data.items():
-    if "Breach" in message:
+    if "Traffic total cross upper warning limit" in message:
         message_class = "red"
-    elif "Not breach" in message:
+    elif "Traffic total is under upper warning limit" in message:
         message_class = "green"
     elif "Upper Warning Limit Not Set" in message:
         message_class = "brown"
